@@ -7,10 +7,12 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from torchsummary import summary
-from torch.utils.data import DataLoader
+from torch.utils.data import DataLoader, random_split
 from torchvision import datasets, transforms
 from autoencoder import Autoencoder
+from colorizationdataset import ColorizationDataset
 from tqdm import tqdm
+from skimage.color import lab2rgb
 
 def get_device():
     # Check if cuda is available
@@ -27,29 +29,23 @@ def get_dataloader(batch_size):
     # Load datasets for training and testing
     # Inbuilt datasets available in torchvision (check documentation online)
 
-    normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
-                                      std=[0.229, 0.224, 0.225])
+    image_count = 1000
+    data_set = ColorizationDataset("../data/train")
 
-    train_set = datasets.ImageFolder(
-            "../data/train",
-            transforms.Compose([
-                    #transforms.RandomResizedCrop(224),
-                    transforms.RandomHorizontalFlip(),
-                    transforms.ToTensor(),
-                    normalize,
-            ]))
-    test_set = datasets.ImageFolder(
-            "../data/test",
-            transforms.Compose([
-                    transforms.ToTensor(),
-            ]))
+    #train_set = torch.utils.data.Subset(train_set, np.random.choice(len(train_set), 2, replace=False))
+    data_set = torch.utils.data.Subset(data_set, np.random.choice(len(data_set), image_count, replace=False))
+
+    train_count = int(0.7 * image_count)
+    test_count = int(0.3 * image_count)
+    
+    train_set, test_set = random_split(data_set, (train_count, test_count))
 
     train_loader = DataLoader(train_set, batch_size=batch_size, 
                                 shuffle=True,num_workers=4)
-    test_loader = DataLoader(test_set, batch_size=10, 
+    test_loader = DataLoader(test_set, batch_size=batch_size, 
                                 shuffle=True,num_workers=4)
 
-    return train_loader, test_loader
+    return train_loader, train_loader
 
 def train(model, device, train_loader, optimizer, criterion, epoch, batch_size):
     
@@ -59,9 +55,6 @@ def train(model, device, train_loader, optimizer, criterion, epoch, batch_size):
     # Empty list to store losses 
     losses = []
     
-    data_transforms = transforms.Compose([
-            transforms.Grayscale(num_output_channels=1)
-    ])
     
     # Iterate over entire training samples (1 epoch)
     with tqdm(train_loader, unit='batch') as tepoch:
@@ -69,16 +62,19 @@ def train(model, device, train_loader, optimizer, criterion, epoch, batch_size):
 
             tepoch.set_description(f"Epoch {epoch+1}")
 
-            target_data, _ = batch
-            input_data = data_transforms(target_data)
+            input_data, target_data = batch
             
-            
+            input_data = input_data.float()
+            target_data = target_data.float()
+
             # Push data/label to correct device
             input_data = input_data.to(device)
+            target_data = target_data.to(device)
             
             # Reset optimizer gradients. Avoids grad accumulation (accumulation used in RNN).
             optimizer.zero_grad()
             
+
             # Do forward pass for current set of data
             output = model(input_data)
             
@@ -105,32 +101,34 @@ def get_model_output(model, device, test_loader):
     # Set model to eval mode to notify all layers.
     model.eval()
     
-    data = None
+    target = None
     output = None
+    batch_size = 0
+    channels = 3
+    lightness = 100
+    ab_color = 128
+
     # Set torch.no_grad() to disable gradient computation and backpropagation
-    data_transforms = transforms.Compose([
-            transforms.Grayscale(num_output_channels=1)
-    ])
     with torch.no_grad():
         for sample in test_loader:
 
-            data, target = sample
-            
-            input_data = data_transforms(data)
+            input_data, target = sample
+
             input_data = input_data.to(device)
             
             output = model(input_data)
             break
     
-    return data, output
+    return target, output #image_input, image_output
 
 def save_images(images, name):
     
     for index, image in enumerate(images):
-        plt.subplot(5, 2, index + 1)
-        plt.imshow(np.transpose(image.numpy(), (1,2,0)))
+        plt.subplot(1, 1, index + 1)
+        image = np.transpose(image.numpy(), (1,2,0))
+        plt.imshow(image)
         plt.axis('off')
-        if index == 9:
+        if index == 0:
             break
         
     plt.savefig(name)
@@ -139,11 +137,12 @@ if __name__ == '__main__':
     
     device = get_device()
     model = Autoencoder().to(device)
-    summary(model, (1,64,64))
+    #model = torch.load("../models/model")
+    summary(model, (1,128,128))
 
     # Model hyperparameters
-    epochs = 75 
-    batch_size = 100
+    epochs = 30
+    batch_size = 100 
     learning_rate = 0.001
     criterion = nn.MSELoss()
     optimizer = optim.Adam(model.parameters(), lr=learning_rate)
@@ -151,18 +150,23 @@ if __name__ == '__main__':
     # Get data from ImageNet dataset and put into dataloader
     train_loader, test_loader = get_dataloader(batch_size)
 
+    for x in train_loader:
+        continue
+
+    
     # Run training for n_epochs specified in config 
     trian_loss = 0.0
     for epoch in range(epochs):
 
         train_loss = train(model, device, train_loader,
-                            optimizer, criterion, epoch, batch_size)
+                           optimizer, criterion, epoch, batch_size)
 
     # Get the predicted output from test data and save images to file
     data, output = get_model_output(model, device, train_loader)
     
     save_images(data, 'data.jpg')
     save_images(output, 'output.jpg')
+    torch.save(model, "../models/model")
 
-    print("Loss is {:2.2f} after {} epochs".format(train_loss, epochs))
+    #print("Loss is {:2.2f} after {} epochs".format(train_loss, epochs))
     print("Training and evaluation finished")
