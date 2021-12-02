@@ -3,7 +3,7 @@ import torch
 
 class EarlyStopping:
 
-    def __init__(self, patience=0, threshold=1e-4):
+    def __init__(self, patience=15, threshold=1e-4):
 
         self.patience = patience
         self.epoch_count = 0
@@ -13,11 +13,11 @@ class EarlyStopping:
 
     def __call__(self, current_loss):
     
-        loss_threshold = self.best_loss * (1 - self.threshold)
+        loss_threshold = float(self.best_loss) * (1 - self.threshold)
 
         if current_loss < loss_threshold:
             self.epoch_count = 0
-            self.best = current_loss
+            self.best_loss = current_loss
         else:
             self.epoch_count += 1
 
