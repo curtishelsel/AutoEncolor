@@ -1,6 +1,8 @@
 import numpy as np
-from torch import no_grad
+import matplotlib.pyplot as plt
 from tqdm import tqdm
+from torch import no_grad
+from torchsummary import summary
 
 def train(model, device, train_loader, optimizer, criterion):
 
@@ -16,9 +18,6 @@ def train(model, device, train_loader, optimizer, criterion):
             tepoch.set_description('  Training')
 
             input_data, target_data = batch
-
-            #input_data = input_data.float()
-            #target_data = target_data.float()
 
             # Push data/label to correct device
             input_data = input_data.to(device)
@@ -43,7 +42,9 @@ def train(model, device, train_loader, optimizer, criterion):
         
             train_loss += ((1 / (index + 1)) * loss_difference) 
 
-    return train_loss
+    print('Train Loss: {:.4f}'.format(train_loss))
+
+    return float(train_loss)
 
 def validation(model, device, validation_loader, criterion):
 
@@ -59,9 +60,6 @@ def validation(model, device, validation_loader, criterion):
 
                 input_data, target_data = batch
 
-                #input_data = input_data.float()
-                #target_data = target_data.float()
-
                 # Push data/label to correct device
                 input_data = input_data.to(device)
                 target_data = target_data.to(device)
@@ -76,4 +74,49 @@ def validation(model, device, validation_loader, criterion):
 
                 validation_loss += ((1 / (index + 1)) * loss_difference) 
 
-    return validation_loss
+    print('Validation Loss: {:.4f}'.format(validation_loss))
+
+    return float(validation_loss)
+
+def show_model_setup(parameters, device, model):
+
+    print("Epochs: {}".format(parameters.epochs))
+    print("Batch Size: {}".format(parameters.batch_size))
+    print("Validation: {}".format(parameters.validation))
+    print("Training Set: {}".format(parameters.mode))
+    print("Learning Rate: {}".format(parameters.learning_rate))
+    print("Early Stopping: {}".format(parameters.early_stopping))
+    print("Torch device selected: {}".format(device))
+
+    summary(model, (1,128,128))
+
+
+def plot_training(train_loss, validation_loss, parameters):
+
+    epochs = parameters.epochs
+    mode = parameters.mode
+    
+    title = 'Network Loss\n' + str(epochs) + ' Epochs on '
+    title += mode.capitalize() + ' Dataset'
+
+    path = '../figures/' + mode + str(epochs) + ' epochs'
+
+    if parameters.early_stopping:
+        path += 'earlystopping'
+
+    path += '.png'
+
+    plt.plot(train_loss, label="Train Loss")
+    if parameters.validation:
+        plt.plot(validation_loss, label="Validation Loss")
+
+    plt.ylabel("Loss")
+    plt.xlabel("Epoch")
+    plt.title(title)
+    plt.legend(loc="upper right")
+    
+    if parameters.show_plot:
+        plt.show()
+    else:
+        plt.savefig(path)
+
