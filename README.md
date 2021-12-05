@@ -1,6 +1,7 @@
 # AutoEncolor
 
 Usage:
+
 To see full list of options:
 
 `python autoencolor.py -h`
