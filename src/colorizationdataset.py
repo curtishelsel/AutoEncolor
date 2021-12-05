@@ -8,7 +8,6 @@ class ColorizationDataset(datasets.ImageFolder):
 
         self.transforms = transforms.Compose([
                             transforms.Grayscale(),
-                            transforms.RandomHorizontalFlip(),
                             transforms.ToTensor()
                             ])
 
