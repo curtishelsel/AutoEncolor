@@ -8,7 +8,7 @@ from checkpoint import *
 from parser import Argparse
 from torch.nn import MSELoss
 from torch.optim import Adam
-from models import Autoencoder, PoolingAutoencoder, ReverseAutoencoder
+from models import Autoencoder, PoolingAutoencoder, ReverseAutoencoder, DeepAutoencoder
 from earlystopping import EarlyStopping
 from imageloader import get_dataloader
 from colorize import color_image, save_images
@@ -29,6 +29,8 @@ def get_model(parameters, device):
         model = ReverseAutoencoder().to(device)
     elif parameters.network == 'pooling':
         model = PoolingAutoencoder().to(device)
+    elif parameters.network == 'deep':
+        model = DeepAutoencoder().to(device)
     else:
         model = Autoencoder().to(device)
 
@@ -38,7 +40,7 @@ def get_model(parameters, device):
 def run_training(parameters, device, model):
     
     show_model_setup(parameters, device, model)
-
+    
     # Model hyperparameters
     epochs = parameters.epochs
     batch_size = parameters.batch_size 
@@ -101,7 +103,7 @@ def run_training(parameters, device, model):
     plot_training(train_loss, validation_loss, parameters)
 
     print("Training and evaluation finished")
-
+    
     return model
 
 def main(parameters):
