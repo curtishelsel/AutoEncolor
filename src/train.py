@@ -99,7 +99,7 @@ def plot_training(train_loss, validation_loss, parameters):
     title = 'Network Loss\n' + str(epochs) + ' Epochs on '
     title += mode.capitalize() + ' Dataset'
 
-    path = '../figures/' + mode + str(epochs) + ' epochs'
+    path = '../figures/' + mode + str(epochs) + 'epochs'
 
     if parameters.early_stopping:
         path += 'earlystopping'
