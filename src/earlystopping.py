@@ -1,5 +1,5 @@
-import numpy as np
 import torch
+import numpy as np
 
 class EarlyStopping:
 
@@ -16,15 +16,18 @@ class EarlyStopping:
         loss_threshold = float(self.best_loss) * (1 - self.threshold)
 
         if current_loss < loss_threshold:
+            if self.epoch_count != 0:
+                print('Early stopping epoch count reset.')
             self.epoch_count = 0
             self.best_loss = current_loss
         else:
             self.epoch_count += 1
+            print('Early stopping {} of {}'.format(self.epoch_count, self.patience))
 
         if self.epoch_count > self.patience:
             self.stop = True
-            print('Maximum epoch threshold exeeded')
-            print('Training stopping early')
+            print('Maximum epoch threshold exeeded.')
+            print('Training stopping early.')
 
 
         
