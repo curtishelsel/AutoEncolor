@@ -3,7 +3,7 @@ from colorizationdataset import ColorizationDataset
 
 def get_dataloader(batch_size, path):
 
-    num_workers = 8
+    num_workers = 8 
 
     data_set = ColorizationDataset(path)
 
