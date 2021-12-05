@@ -13,7 +13,7 @@ def color_image(model, device, path, mode):
                 transforms.ToTensor()])
 
     if path == None:
-        path = '../data/train_' + mode + '/faces/'
+        path = '../data/test_' + mode + '/faces/'
         path += np.random.choice(os.listdir(path))
         
     original_image = Image.open(path)
