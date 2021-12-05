@@ -33,14 +33,15 @@ class Argparse():
 
         parser.add_argument('-m', '--mode', 
                             help='sets dataset for training model \
-                            full = 70000, small = 7000, and tiny = 700',
-                            choices=['full', 'small', 'tiny'], 
+                            full = 70000, medium = 15000, \
+                            small = 7000, and tiny = 700',
+                            choices=['full', 'medium', 'small', 'tiny'], 
                             default='full')
 
         parser.add_argument('-n', '--network', 
                             help='sets network model for training \
                             and inference',
-                            choices=['reverse', 'pooling', 'classic'], 
+                            choices=['reverse', 'pooling', 'deep', 'classic'], 
                             default='classic')
 
         parser.add_argument('-p', '--show_plot', 
