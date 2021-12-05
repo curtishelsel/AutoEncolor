@@ -2,12 +2,12 @@
 
 Directoru Structure
 
-├── data
-│   ├── test\_full
-│   ├── test\_medium
-│   ├── test\_small
-│   ├── test\_tiny
-│   ├── train\_full
+├── data \
+│   ├── test\_full\
+│   ├── test\_medium\
+│   ├── test\_small\
+│   ├── test\_tiny\
+│   ├── train\_full\
 │   ├── train\_medium
 │   ├── train\_small
 │   ├── train\_tiny
