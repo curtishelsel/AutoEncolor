@@ -46,11 +46,12 @@ def load_checkpoint(model, optimizer, parameters):
 
     return model, optimizer, epoch, loss
 
-def load_model(model, parameters):
+def load_model(model, parameters, device):
 
+    
     best_path = '../models/best_' + parameters.network + '_model.pt'
     try:
-        best_model = torch.load(best_path)
+        best_model = torch.load(best_path, map_location=device)
         model.load_state_dict(best_model['model_state_dict'])
     except Exception as e:
         print(e)

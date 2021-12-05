@@ -115,7 +115,7 @@ def main(parameters):
     if parameters.train:
         model = run_training(parameters, device, model)
     else:
-        model = load_model(model, parameters)
+        model = load_model(model, parameters, device)
     
     images = color_image(model, device, parameters.image, parameters.mode)
     save_images(images)
