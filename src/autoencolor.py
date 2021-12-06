@@ -1,4 +1,7 @@
+# Program trains and makes inference on converting
+# grayscale images to RGB image
 # Author: Curtis Helsel
+# December 2021
 
 import torch
 import numpy as np 
@@ -21,7 +24,7 @@ def get_device():
     use_cuda = torch.cuda.is_available()
     
     # Set proper device based on cuda availability 
-    device = torch.device("cuda" if use_cuda else "cpu")
+    device = torch.device('cuda' if use_cuda else 'cpu')
     
     return device
 
@@ -127,7 +130,7 @@ def run_training(parameters, device, model):
     # Plot the training once it is complete
     plot_training(train_loss, validation_loss, parameters)
 
-    print("Training and evaluation finished")
+    print('Training and evaluation finished')
     
     return model
 
