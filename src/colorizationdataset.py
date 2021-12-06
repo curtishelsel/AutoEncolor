@@ -1,6 +1,9 @@
 # This file contains the class for the 
 # custom dataset for loading images to use
 # in training and with DataLoader
+# Author: Curtis Helsel
+# December 2021
+
 from torchvision import datasets, transforms
 
 # This class loads images in a subfolder,
