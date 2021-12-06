@@ -1,3 +1,8 @@
+# This file contains the classes for the different 
+# model options to train
+# Author: Curtis Helsel
+# December 2021
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -6,12 +11,15 @@ class ReverseAutoencoder(nn.Module):
     def __init__(self):
         super(ReverseAutoencoder, self).__init__()
 
+        # Convolutional Layers (Encoder)
         self.conv1 = nn.Conv2d(1, 64, 3)
         self.conv2 = nn.Conv2d(64, 128, 3)
         self.conv3 = nn.Conv2d(128, 128, 3)
         self.conv4 = nn.Conv2d(128, 256, 3)
         self.conv5 = nn.Conv2d(256, 256, 3)
         self.conv6 = nn.Conv2d(256, 512, 3)
+
+        # Transposed Convolutional Layers (Decoder)
         self.t_conv1 = nn.ConvTranspose2d(512, 256, 3)
         self.t_conv2 = nn.ConvTranspose2d(256, 256, 3)
         self.t_conv3 = nn.ConvTranspose2d(256, 128, 3)
@@ -43,12 +51,15 @@ class PoolingAutoencoder(nn.Module):
     def __init__(self):
         super(PoolingAutoencoder, self).__init__()
            
+        # Convolutional Layers (Encoder)
         self.conv1 = nn.Conv2d(1, 512, 3, padding=1)
         self.conv2 = nn.Conv2d(512, 256, 3, padding=1)
         self.conv3 = nn.Conv2d(256, 256, 3, padding=1)
         self.conv4 = nn.Conv2d(256, 128, 3, padding=1)
         self.conv5 = nn.Conv2d(128, 128, 3, padding=1)
         self.conv6 = nn.Conv2d(128, 64, 3, padding=1)
+
+        # Transposed Convolutional Layers (Decoder)
         self.t_conv1 = nn.ConvTranspose2d(64, 128, 3, padding=1)
         self.t_conv2 = nn.ConvTranspose2d(128, 128, 3, padding=1)
         self.t_conv3 = nn.ConvTranspose2d(128, 256, 3, padding=1)
@@ -56,6 +67,8 @@ class PoolingAutoencoder(nn.Module):
         self.t_conv5 = nn.ConvTranspose2d(256, 512, 3, padding=1)
         self.t_conv6 = nn.ConvTranspose2d(512, 3, 3, padding=1)
         
+        # Upsampling and Maxpooling layers used to decrease
+        # and increase size of the output
         self.upsampling = nn.Upsample(scale_factor=2)
         self.pool = nn.MaxPool2d((2,2))
 
@@ -93,12 +106,15 @@ class Autoencoder(nn.Module):
     def __init__(self):
         super(Autoencoder, self).__init__()
     
+        # Convolutional Layers (Encoder)
         self.conv1 = nn.Conv2d(1, 512, 3, padding=1)
         self.conv2 = nn.Conv2d(512, 256, 3, padding=1)
         self.conv3 = nn.Conv2d(256, 256, 3, padding=1)
         self.conv4 = nn.Conv2d(256, 128, 3, padding=1)
         self.conv5 = nn.Conv2d(128, 128, 3, padding=1)
         self.conv6 = nn.Conv2d(128, 64, 3, padding=1)
+
+        # Transposed Convolutional Layers (Decoder)
         self.t_conv2 = nn.ConvTranspose2d(64, 128, 3, padding=1)
         self.t_conv3 = nn.ConvTranspose2d(128, 128, 3, padding=1)
         self.t_conv4 = nn.ConvTranspose2d(128, 256, 3, padding=1)
@@ -131,6 +147,7 @@ class DeepAutoencoder(nn.Module):
     def __init__(self):
         super(DeepAutoencoder, self).__init__()
     
+        # Convolutional Layers (Encoder)
         self.conv1 = nn.Conv2d(1, 512, 3)
         self.conv2 = nn.Conv2d(512, 256, 3)
         self.conv3 = nn.Conv2d(256, 128, 3)
@@ -141,6 +158,7 @@ class DeepAutoencoder(nn.Module):
         self.conv8 = nn.Conv2d(8, 4, 3)
         self.conv9 = nn.Conv2d(4, 2, 3)
 
+        # Fully connected layers (Encoder)
         self.fc1 = nn.Linear(2*110*110, 512)
         self.fc2 = nn.Linear(512, 256)
         self.fc3 = nn.Linear(256, 128)
@@ -148,6 +166,7 @@ class DeepAutoencoder(nn.Module):
         self.fc5 = nn.Linear(64, 32)
         self.fc6 = nn.Linear(32, 16)
 
+        # Fully connected layers (Decoder)
         self.fc7 = nn.Linear(16, 32)
         self.fc8 = nn.Linear(32, 64)
         self.fc9 = nn.Linear(64, 128)
@@ -155,6 +174,7 @@ class DeepAutoencoder(nn.Module):
         self.fc11 = nn.Linear(256, 512)
         self.fc12 = nn.Linear(512, 2*110*110)
         
+        # Transposed Convolutional Layers (Decoder)
         self.t_conv1 = nn.ConvTranspose2d(2, 4, 3)
         self.t_conv2 = nn.ConvTranspose2d(4, 8, 3)
         self.t_conv3 = nn.ConvTranspose2d(8, 16, 3)
@@ -179,6 +199,8 @@ class DeepAutoencoder(nn.Module):
         x = F.relu(self.conv8(x))
         x = F.relu(self.conv9(x))
 
+        # Resizes the output of convolutional
+        # layer to an input for a fully connected layer
         x = x.view(x.size()[0], -1)
 
         x = F.relu(self.fc1(x))
@@ -197,6 +219,8 @@ class DeepAutoencoder(nn.Module):
         x = F.relu(self.fc11(x))
         x = F.relu(self.fc12(x))
 
+        # Resizes the output of a fully connected layer 
+        # to an input for a convolutional layer
         x = x.view(x.size()[0], 2, 110,110)
         
         x = F.relu(self.t_conv1(x))
