@@ -1,6 +1,8 @@
 # This class gathers all the command line
 # arguments and provides them as a single
 # parameter set
+# Curtis Helsel
+# December 2021
 
 import argparse
 
