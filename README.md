@@ -1,4 +1,8 @@
 # AutoEncolor
+This project presents an image colorization approach using advanced autoencoders and tools such as PyTorch, Python, NumPy, and Matplotlib. The focus is on transforming grayscale images into vibrant RGB images, with a particular emphasis on facial feature colorization. The project explores different network architectures, implements performance optimizations, and leverages a diverse faces dataset (Flickr-Faces-HQ) to achieve realistic and visually appealing results. While the main objective is facial colorization, there is potential for further development in background colorization. 
+
+![alt text](figures/Autoencolor.png)
+
 
 Usage:
 
